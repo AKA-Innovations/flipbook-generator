@@ -91,7 +91,6 @@ export const useBookStore = create<BookState>((set, get) => ({
   setMetadata: (metadata) => set({ metadata }),
   setToc: (toc) => set({ toc }),
   setProgress: (p) => set((s) => ({ progress: { ...s.progress, ...p } })),
-  setEditMode: (editMode) => set({ editMode }),
 
   setPageState: (pageNumber, patch) =>
     set((s) => ({

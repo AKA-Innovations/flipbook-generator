@@ -22,6 +22,10 @@ interface PageFlipBounds {
   pageWidth: number;
 }
 
+type PageFlipWithBounds = PageFlip & {
+  getBoundsRect?: () => PageFlipBounds;
+};
+
 /**
  * Renders the actual flip-book surface. Each "page" is a div containing
  * either the rendered PDF page image (once ready) or a skeleton. PageFlip
@@ -97,9 +101,26 @@ export function FlipbookViewer() {
     });
 
     const updateBounds = () => {
-      if (flip) {
-        setBounds(flip.getBoundsRect());
+      const flipWithBounds = flip as PageFlipWithBounds;
+      const rect = flipWithBounds.getBoundsRect?.();
+
+      if (rect) {
+        setBounds(rect);
+        return;
       }
+
+      const containerRect = container.getBoundingClientRect();
+      const width = containerRect.width || 500;
+      const height = containerRect.height || 700;
+      const pageWidth = settings.viewMode === 'single' ? width : width / 2;
+
+      setBounds({
+        left: 0,
+        top: 0,
+        width,
+        height,
+        pageWidth,
+      });
     };
 
     flip.loadFromImages(images);

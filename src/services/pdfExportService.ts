@@ -68,7 +68,7 @@ function drawTextBox(ctx: CanvasRenderingContext2D, text: string, xPct: number, 
 
 export async function exportAnnotatedPdf(
   doc: PDFDocumentProxy,
-  title: string,
+  _title: string,
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
   const totalPages = doc.numPages;
