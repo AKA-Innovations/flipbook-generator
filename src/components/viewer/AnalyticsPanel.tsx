@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useAppStore } from '@/store/appStore';
 import { FiX, FiActivity, FiClock, FiEye, FiDownload, FiExternalLink } from 'react-icons/fi';
 import { GlassCard } from '@/components/common/GlassCard';
@@ -9,6 +10,18 @@ interface Props {
 export function AnalyticsPanel({ onClose }: Props) {
   const activeProjectId = useAppStore((s) => s.activeProjectId);
   const project = useAppStore((s) => s.recentProjects.find((p) => p.id === activeProjectId));
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
 
   if (!project) return null;
 
@@ -59,8 +72,18 @@ export function AnalyticsPanel({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col text-slate-950 dark:text-slate-50">
+    <div
+      ref={backdropRef}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 pointer-events-auto"
+      onClick={(e) => {
+        if (e.target === backdropRef.current) {
+          onClose();
+        }
+      }}
+    >
+      <div
+        className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col text-slate-950 dark:text-slate-50 pointer-events-auto"
+      >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
@@ -68,8 +91,9 @@ export function AnalyticsPanel({ onClose }: Props) {
             <h3 className="font-bold text-lg">Document Analytics</h3>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+            className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-accent/50 pointer-events-auto z-10"
           >
             <FiX className="text-lg" />
           </button>
@@ -101,6 +125,7 @@ export function AnalyticsPanel({ onClose }: Props) {
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-xs uppercase text-slate-400 font-bold tracking-wider">Engagement by Page</h4>
               <button
+                type="button"
                 onClick={handleExportCSV}
                 className="text-xs text-accent font-medium hover:underline inline-flex items-center gap-1.5"
               >

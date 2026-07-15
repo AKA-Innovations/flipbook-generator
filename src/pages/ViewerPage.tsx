@@ -9,6 +9,7 @@ import { ViewerSidebar } from '@/components/sidebar/ViewerSidebar';
 import { FlipbookViewer } from '@/components/viewer/FlipbookViewer';
 import { SettingsPanel } from '@/components/settings/SettingsPanel';
 import { ExportModal } from '@/components/viewer/ExportModal';
+import { AnalyticsPanel } from '@/components/viewer/AnalyticsPanel';
 import { exportFlipbook, type ExportProgress } from '@/services/exportService';
 
 interface Props {
@@ -23,6 +24,7 @@ export function ViewerPage({ onBack }: Props) {
   const settings = useBookStore((s) => s.settings);
   const reset = useBookStore((s) => s.reset);
   const [exportProgress, setExportProgress] = useState<ExportProgress | null>(null);
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   // Synchronize changes to appStore (which persists to LocalStorage)
   const activeProjectId = useAppStore((s) => s.activeProjectId);
@@ -83,7 +85,12 @@ export function ViewerPage({ onBack }: Props) {
           <span className="text-sm font-medium truncate">{metadata.title}</span>
         )}
         <span className="ml-auto" />
-        <ViewerToolbar onDownload={handleDownload} isExporting={!!exportProgress} />
+        <ViewerToolbar
+          onDownload={handleDownload}
+          isExporting={!!exportProgress}
+          analyticsOpen={analyticsOpen}
+          onAnalyticsClose={() => setAnalyticsOpen((v) => !v)}
+        />
       </div>
 
       <div className="flex-1 flex min-h-0">
@@ -95,6 +102,9 @@ export function ViewerPage({ onBack }: Props) {
 
       <SettingsPanel />
       <ExportModal progress={exportProgress} />
+      {analyticsOpen && (
+        <AnalyticsPanel onClose={() => setAnalyticsOpen(false)} />
+      )}
     </div>
   );
 }

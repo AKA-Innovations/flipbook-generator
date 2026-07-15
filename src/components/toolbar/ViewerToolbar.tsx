@@ -18,7 +18,6 @@ import {
 import { useBookStore } from '@/store/bookStore';
 import { IconButton } from '@/components/common/IconButton';
 import { SearchPanel } from '@/components/viewer/SearchPanel';
-import { AnalyticsPanel } from '@/components/viewer/AnalyticsPanel';
 
 import { saveAs } from 'file-saver';
 import { exportAnnotatedPdf } from '@/services/pdfExportService';
@@ -26,9 +25,11 @@ import { exportAnnotatedPdf } from '@/services/pdfExportService';
 interface Props {
   onDownload: () => void;
   isExporting: boolean;
+  analyticsOpen: boolean;
+  onAnalyticsClose: () => void;
 }
 
-export function ViewerToolbar({ onDownload, isExporting }: Props) {
+export function ViewerToolbar({ onDownload, isExporting, analyticsOpen, onAnalyticsClose }: Props) {
   const currentPage = useBookStore((s) => s.currentPage);
   const totalPages = useBookStore((s) => s.metadata?.pageCount ?? 0);
   const goToPage = useBookStore((s) => s.goToPage);
@@ -45,7 +46,6 @@ export function ViewerToolbar({ onDownload, isExporting }: Props) {
   const metadata = useBookStore((s) => s.metadata);
 
   const [searchOpen, setSearchOpen] = useState(false);
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [downloadMenuOpen, setDownloadMenuOpen] = useState(false);
   const [isPdfCompiling, setIsPdfCompiling] = useState(false);
@@ -132,7 +132,7 @@ export function ViewerToolbar({ onDownload, isExporting }: Props) {
         <IconButton label="Search" active={searchOpen} onClick={() => setSearchOpen((v) => !v)}>
           <FiSearch />
         </IconButton>
-        <IconButton label="Analytics" active={analyticsOpen} onClick={() => setAnalyticsOpen((v) => !v)}>
+        <IconButton label="Analytics" active={analyticsOpen} onClick={() => onAnalyticsClose()}>
           <FiActivity />
         </IconButton>
         <IconButton label="Settings" onClick={() => toggleSettings()}>
@@ -187,10 +187,6 @@ export function ViewerToolbar({ onDownload, isExporting }: Props) {
         <div className="absolute top-full mt-2 right-0 z-20">
           <SearchPanel onClose={() => setSearchOpen(false)} />
         </div>
-      )}
-
-      {analyticsOpen && (
-        <AnalyticsPanel onClose={() => setAnalyticsOpen(false)} />
       )}
 
       {/* rotation is applied to the flipbook container by a CSS var consumer;
